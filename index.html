@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phoenix Marketcity Kurla – Indoor Navigator</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--text:#1a1d23;--muted:#667085;--line:#e4e7ec;--accent:#0f9d58;--route:#e8590c;--map:#eef2f6;--grid:#d5dce6;--warn:#fff4e5;--warnt:#8a4b00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1218;--panel:#181c24;--text:#e8eaee;--muted:#98a2b3;--line:#2a303b;--accent:#34c785;--route:#ff8a4c;--map:#141922;--grid:#2b3442;--warn:#33270f;--warnt:#f5c26b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1218;--panel:#181c24;--text:#e8eaee;--muted:#98a2b3;--line:#2a303b;--accent:#34c785;--route:#ff8a4c;--map:#141922;--grid:#2b3442;--warn:#33270f;--warnt:#f5c26b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{max-width:1100px;margin:0 auto;padding:16px 20px 4px}
+h1{margin:0;font-size:1.25rem}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.warn{max-width:1060px;margin:10px auto 0;padding:9px 12px;background:var(--warn);color:var(--warnt);border-radius:10px;font-size:13px}
+main{display:grid;grid-template-columns:330px 1fr;gap:16px;max-width:1100px;margin:12px auto 24px;padding:0 20px}
+@media (max-width:780px){main{grid-template-columns:1fr}.warn{margin:10px 20px 0}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 3px}
+select,input[type=search]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button.b{border:1px solid var(--line);background:var(--bg);color:var(--text);padding:8px 12px;border-radius:10px;font:inherit;cursor:pointer}
+button.b.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sum{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg)}
+.sum b{color:var(--route)}
+ol{margin:10px 0 0;padding-left:20px}
+ol li{padding:3px 0}
+ol li small{color:var(--muted)}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.wrap{position:relative}
+svg{width:100%;display:block;background:var(--map);border-radius:10px;aspect-ratio:600/410;touch-action:none;cursor:grab;user-select:none}
+.zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px;cursor:pointer}
+.hint{position:absolute;left:10px;top:10px;right:60px;padding:8px 12px;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;display:none}
+.hint.show{display:block}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-height:190px;overflow:auto}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:999px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{border-color:var(--route);outline:1px solid var(--route)}
+.chip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.cor{stroke:var(--grid);stroke-width:24;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cor2{stroke:var(--panel);stroke-width:16;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:.85}
+.spur{stroke:var(--muted);stroke-opacity:.16;stroke-width:1.2;fill:none;stroke-dasharray:2 2}
+.ant{stroke:var(--route);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:10 9;animation:flow .9s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-19}}
+.pin text{fill:#fff;font-size:8px;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.tile rect{fill:var(--panel);stroke-width:1}
+.tile text{fill:var(--text);font-size:7.5px;text-anchor:middle;dominant-baseline:central}
+.lbl{fill:var(--text);font-size:9px;font-weight:600;paint-order:stroke;stroke:var(--map);stroke-width:3px}
+@media (prefers-reduced-motion:reduce){.ant{animation:none}}
+</style>
+</head>
+<body>
+<header>
+<h1>Phoenix Marketcity Kurla – Indoor Navigator</h1>
+<p>Tell it where you are and where you want to go. It plans the walk and the escalators across the main mall (LG to 2nd floor) and Phoenix Paragon Plaza (LG to 4th floor).</p>
+</header>
+<div class="warn">Store names and floor levels come from the mall directory in your case study. Positions, distances and walking paths are <b>approximate</b>, estimated from the floor-plan photos. Phoenix Paragon Plaza comes from the developer’s sale plans, and its link to the main mall (the boulevard from Entrance 2) is an assumption.</div>
+<main>
+<section class="card">
+<label for="from">I’m at</label><select id="from"></select>
+<label for="to">I want to go to</label><select id="to"></select>
+<div class="row"><button class="b" id="pick">Pick my spot on map</button><button class="b" id="swap">Swap</button></div>
+<div class="row"><button class="b" id="nw">Nearest washroom</button><button class="b" id="na">Nearest ATM</button></div>
+<div class="sum" id="sum"></div>
+<ol id="steps"></ol>
+</section>
+<section class="card">
+<div class="tabs" id="tabs"></div>
+<div class="wrap">
+<svg id="map" viewBox="10 90 600 410" role="img" aria-label="Floor map. Drag to move, scroll or pinch to zoom, tap a place to select it."></svg>
+<div class="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="zf" aria-label="Fit map" style="font-size:13px">Fit</button></div>
+<div class="hint" id="hint">Tap where you are on the map. I’ll snap to the nearest place.</div>
+</div>
+<div class="legend"><span><i style="background:#7c3aed"></i>Atrium: round escalator hub (↕)</span><span><i style="background:#475467"></i>Entrance</span><span><i style="background:#0f9d58"></i>Shop</span><span><i style="background:#e8590c"></i>Food & cafés</span><span><i style="background:#0284c7"></i>Fun & cinema</span><span><i style="background:#0891b2"></i>Washrooms, ATMs & lifts</span><span><i style="background:#b45309"></i>Offices</span><span><i style="background:#2563eb"></i>You</span><span><i style="background:#e8590c;outline:2px solid #e8590c;outline-offset:1px;background:#fff"></i>Destination</span></div>
+<p style="font-size:12px;color:var(--muted);margin:8px 0 0">An atrium is one of the round hubs with escalators. Signs inside the mall call them Atrium 1 to 6, so use them as landmarks. Tap a step on the left to jump to its floor.</p>
+<div class="row"><button class="b" id="names">Show all names</button></div>
+<div class="row" id="cats"></div>
+<label for="q">Places, closest first once you’ve set where you are. Tap one to go there.</label>
+<input type="search" id="q" placeholder="Search this floor…">
+<div class="chips" id="chips"></div>
+</section>
+</main>
+<script>
+/* ===== MALL DATA (edit here): levels, atria, entrances, places ===== */
+var FL=["LG","Ground","1st floor","2nd floor","Paragon LG","Paragon UG","Paragon 1st","Paragon 2nd","Paragon 3rd","Paragon 4th"],FLN=["Lower ground floor","Ground floor","1st floor","2nd floor","Paragon Plaza, lower ground","Paragon Plaza, upper ground","Paragon Plaza, 1st floor","Paragon Plaza, 2nd floor","Paragon Plaza, 3rd floor","Paragon Plaza, 4th floor"];
+var ATR={1:[370,635],2:[590,465],3:[875,300],4:[990,215],5:[815,160],6:[610,160]};
+var HAS=[[2,3,5,6],[1,2,3,4,5,6],[1,2,3,4,5,6],[2,3,4]];
+var COR=[[1,2],[2,3],[3,4],[2,6,[[530,300]]],[6,5],[5,4,[[900,170]]],[5,3,[[845,245]]]];
+var ENT=[["Entrance 1",200,745,1],["Entrance 2",680,550,2],["Entrance 3",935,360,3],["Entrance 4",1120,318,4]];
+var PL=[
+["Reliance Smart",0,1065,205,"shop"],["Reliance Digital",0,1015,335,"shop"],["Freezing Rains at Snow World",0,645,290,"fun"],["Max",0,755,280,"shop"],["H&M (LG)",0,520,110,"shop"],["Marks & Spencer (LG)",0,805,75,"shop"],["Nike",0,410,515,"shop"],["Sports Station",0,360,575,"shop"],["Market 99",0,280,715,"shop"],["Hypermarket entrance",0,890,430,"ent"],["Bata",0,690,185,"shop"],["Café Coffee Day",0,845,250,"food"],["Hush Puppies",0,520,325,"shop"],
+["Zara",1,700,290,"shop"],["H&M (Ground)",1,545,150,"shop"],["Marks & Spencer (Ground)",1,810,95,"shop"],["Pantaloons",1,1060,100,"shop"],["Lifestyle (Ground)",1,1150,250,"shop"],["R Trends",1,1130,175,"shop"],["Croma",1,930,95,"shop"],["Sephora",1,640,225,"shop"],["Nyasa (Apple reseller)",1,820,215,"shop"],["Chili’s",1,1035,310,"food"],["Diesel",1,570,540,"shop"],["Forever 21 (Ground)",1,440,640,"shop"],["Krispy Kreme",1,880,330,"food"],["Aeropostale",1,965,300,"shop"],["Swarovski",1,440,480,"shop"],["Mango",1,500,570,"shop"],["ICICI Bank & ATM",1,140,760,"shop"],["Renault",1,190,715,"shop"],
+["PVR Cinemas",2,1110,110,"fun"],["Burger King",2,1090,195,"food"],["Lifestyle (1st floor)",2,1150,245,"shop"],["Starbucks",2,985,327,"food"],["Dublin Square",2,780,260,"food"],["Pizza Hut",2,700,170,"food"],["Punjab Grill",2,755,175,"food"],["Indigo Delicatessen",2,900,175,"food"],["Hamleys",2,950,90,"shop"],["Amoeba Bowling & Sports Bar",2,755,65,"fun"],["Happy Planet",2,830,65,"fun"],["Crossword",2,910,90,"shop"],
+["Food Court",3,1100,145,"food"],["McDonald’s & McCafé",3,985,115,"food"],["KFC",3,1045,275,"food"],["Domino’s",3,1175,160,"food"],["Subway",3,1010,100,"food"],["Wow! Momo",3,1075,95,"food"],["Natural Ice Cream",3,1140,120,"food"],["Rajdhani",3,1095,235,"food"],["Timezone Gaming",3,650,445,"fun"],["Funzone",3,790,385,"fun"],["Flight 4 Fantasy",3,835,355,"fun"],["Rain Forest",3,750,310,"food"],["Balaji",3,875,295,"food"],["Café Delhi Heights",3,950,295,"food"],
+["Washrooms (LG, near Enrich Salon)",0,485,208,"svc"],["Washrooms (LG, near Marks & Spencer)",0,870,55,"svc"],["Washrooms (LG, near Market 99)",0,250,660,"svc"],["ATM (LG, near Market 99)",0,365,690,"svc"],
+["Washrooms (Ground, near Atrium 1)",1,265,605,"svc"],["Washrooms (Ground, near H&M)",1,490,240,"svc"],["Washrooms (Ground, near Croma)",1,880,60,"svc"],["Washrooms (Ground, near Entrance 4)",1,1075,310,"svc"],["ATM (Ground, near Entrance 1)",1,275,735,"svc"],["ATM (Ground, near Atrium 6)",1,735,148,"svc"],
+["Washrooms (1st floor, west side)",2,468,243,"svc"],["Washrooms (1st floor, near Hamleys)",2,860,35,"svc"],["Washrooms (1st floor, near Harry’s Bar)",2,1090,305,"svc"],["Washrooms (1st floor, near Atrium 1)",2,265,645,"svc"],["ATM (1st floor, near Atrium 3)",2,935,280,"svc"],
+["Washrooms (2nd floor, near Timezone)",3,705,335,"svc"],["Washrooms (2nd floor, near the Food Court)",3,1125,230,"svc"]
+];
+/* ===== ENGINE ===== */
+var MPP=0.3,N={},E=[],NS="http://www.w3.org/2000/svg",svg=document.getElementById("map");
+function add(id,name,f,x,y,t){N[id]={id:id,name:name,f:f,p:[x,y],t:t}}
+function edge(a,b,via,x,v,k,tag){E.push({a:a,b:b,via:via||[],x:x||0,v:!!v,k:k===undefined?1:k,tag:tag})}
+function A(n,f){return"A"+n+"_"+f}
+HAS.forEach(function(ns,f){ns.forEach(function(n){add(A(n,f),"Atrium "+n,f,ATR[n][0],ATR[n][1],"atr")})});
+HAS.forEach(function(ns,f){COR.forEach(function(c){if(ns.indexOf(c[0])>=0&&ns.indexOf(c[1])>=0)edge(A(c[0],f),A(c[1],f),c[2])})});
+for(var f=0;f<3;f++)HAS[f].forEach(function(n){if(HAS[f+1].indexOf(n)>=0)edge(A(n,f),A(n,f+1),[],25,true)});
+ENT.forEach(function(e,i){add("N"+i,e[0],1,e[1],e[2],"ent");edge("N"+i,A(e[3],1))});
+function nearA(f,x,y){return HAS[f].slice().sort(function(a,b){return Math.hypot(ATR[a][0]-x,ATR[a][1]-y)-Math.hypot(ATR[b][0]-x,ATR[b][1]-y)}).slice(0,2)}
+PL.forEach(function(p,i){add("P"+i,p[0],p[1],p[2],p[3],p[4]);nearA(p[1],p[2],p[3]).forEach(function(n){edge(A(n,p[1]),"P"+i)})});
+/* ===== PHOENIX PARAGON PLAZA (from the developer sale plans). Coordinates are plan-image pixels; PG() maps them into the map frame ===== */
+function PG(x,y){return[0.92*x+80,0.92*(y-60)+30]}
+var PGPOLY=[[160,740],[290,560],[560,320],[900,110],[1020,85],[1075,300],[1080,665],[560,660],[400,700],[260,775]].map(function(p){return PG(p[0],p[1])});
+var PHUB={4:[820,565],5:[885,415],6:[935,425],7:[955,430]},PLIFT={4:[850,520],5:[730,505],6:[730,525],7:[765,520],8:[710,515],9:[735,520]};
+Object.keys(PLIFT).forEach(function(f){f=+f;var l=PG(PLIFT[f][0],PLIFT[f][1]);add("PL"+f,"Paragon lifts",f,l[0],l[1],"svc");if(PHUB[f]){var h=PG(PHUB[f][0],PHUB[f][1]);add("PH"+f,"Paragon Atrium 1",f,h[0],h[1],"atr");edge("PH"+f,"PL"+f,[],0,false,0.47)}});
+edge("PH5","PH6",[],25,true,0);edge("PH6","PH7",[],25,true,0);
+for(var pf=4;pf<9;pf++)edge("PL"+pf,"PL"+(pf+1),[],20,true,0,"lift");
+var PGL=[["LBS Entry",5,265,775,"ent"],["Office Entrance (Paragon)",5,740,665,"ent"],["Boulevard Entry",5,595,320,"ent"],["Gold Souk Entry",5,985,95,"ent"],["Paragon Entrance 2",5,505,250,"ent"],["Ramp to parking (Paragon)",5,1040,640,"ent"],["Washrooms (Paragon UG)",5,880,600,"svc"],["Washrooms (Paragon LG)",4,860,535,"svc"],["Washrooms (Paragon 1st, west)",6,500,690,"svc"],["Washrooms (Paragon 1st, east)",6,1085,490,"svc"],["Paragon Food Court",7,1040,520,"food"],["Fine dining terraces (Paragon 2nd)",7,950,200,"food"],["Open restaurant, Paragon Atrium 4",7,1045,350,"food"],["Washrooms (Paragon 2nd, west)",7,545,665,"svc"],["Washrooms (Paragon 2nd, east)",7,1085,430,"svc"],["Offices (Paragon 3rd floor)",8,500,430,"off"],["Washrooms (Paragon 3rd, west)",8,505,690,"svc"],["Washrooms (Paragon 3rd, east)",8,1050,440,"svc"],["Offices (Paragon 4th floor)",9,500,430,"off"],["Washrooms (Paragon 4th, west)",9,570,655,"svc"],["Washrooms (Paragon 4th, east)",9,1060,445,"svc"]];
+PGL.forEach(function(p,i){var q=PG(p[2],p[3]);add("PG"+i,p[0],p[1],q[0],q[1],p[4]);["PH","PL"].forEach(function(k){if(N[k+p[1]])edge(k+p[1],"PG"+i,[],0,false,0.47)})});
+var BEID=Object.keys(N).filter(function(i){return N[i].name==="Boulevard Entry"})[0];
+edge("N1",BEID,[],60,true,0,"link");
+function geo(e,fw){var g=[N[e.a].p].concat(e.via,[N[e.b].p]);return fw?g:g.slice().reverse()}
+function len(g){var d=0;for(var i=1;i<g.length;i++)d+=Math.hypot(g[i][0]-g[i-1][0],g[i][1]-g[i-1][1]);return d*MPP}
+E.forEach(function(e){e.len=len(geo(e,true))*e.k*(1+0.0005*N[e.a].f)+e.x});
+function adj(id){var r=[];E.forEach(function(e){if(e.a===id)r.push([e.b,e,true]);else if(e.b===id)r.push([e.a,e,false])});return r}
+function solve(a,b){var D={},pv={},dn={},ids=Object.keys(N);ids.forEach(function(i){D[i]=1e9});D[a]=0;
+for(var k=0;k<ids.length;k++){var u=null;ids.forEach(function(i){if(!dn[i]&&(u===null||D[i]<D[u]))u=i});if(u===null||D[u]>=1e9)break;dn[u]=1;if(u===b)break;
+adj(u).forEach(function(n){var nd=D[u]+n[1].len;if(nd<D[n[0]]){D[n[0]]=nd;pv[n[0]]=[u,n[1],n[2]]}})}
+if(D[b]>=1e9)return null;var p=[],c=b;while(c!==a){var q=pv[c];p.unshift({from:q[0],to:c,e:q[1],fwd:q[2]});c=q[0]}return p}
+function X(p){return[30+0.5*(p[0]-100),100+0.5*(p[1]-30)]}
+function pts(a){return a.map(function(p){var q=X(p);return q[0].toFixed(1)+","+q[1].toFixed(1)}).join(" ")}
+/* ===== VIEW (zoom / pan) ===== */
+var BX=10,BY=90,BW=600,BH=410,vb={x:BX,y:BY,w:BW,h:BH};
+function clampVB(){vb.x=Math.max(BX-80,Math.min(BX+BW-vb.w+80,vb.x));vb.y=Math.max(BY-60,Math.min(BY+BH-vb.h+60,vb.y))}
+function setVB(){svg.setAttribute("viewBox",vb.x.toFixed(1)+" "+vb.y.toFixed(1)+" "+vb.w.toFixed(1)+" "+vb.h.toFixed(1))}
+function zoomAt(cx,cy,f){var nw=Math.min(BW,Math.max(BW/6,vb.w/f)),nh=nw*BH/BW;vb.x=cx-(cx-vb.x)*(nw/vb.w);vb.y=cy-(cy-vb.y)*(nh/vb.h);vb.w=nw;vb.h=nh;clampVB();setVB();draw()}
+function toSvg(cx,cy){var p=svg.createSVGPoint();p.x=cx;p.y=cy;return p.matrixTransform(svg.getScreenCTM().inverse())}
+function zc(f){zoomAt(vb.x+vb.w/2,vb.y+vb.h/2,f)}
+document.getElementById("zi").onclick=function(){zc(1.4)};
+document.getElementById("zo").onclick=function(){zc(1/1.4)};
+document.getElementById("zf").onclick=function(){vb={x:BX,y:BY,w:BW,h:BH};setVB();draw()};
+svg.addEventListener("wheel",function(e){e.preventDefault();var p=toSvg(e.clientX,e.clientY);zoomAt(p.x,p.y,e.deltaY<0?1.2:1/1.2)},{passive:false});
+var ptr={},pinch=0;
+svg.addEventListener("pointerdown",function(e){svg.setPointerCapture(e.pointerId);ptr[e.pointerId]={x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,m:false};pinch=0});
+svg.addEventListener("pointermove",function(e){var p=ptr[e.pointerId];if(!p)return;var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;if(Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>6)p.m=true;
+var ids=Object.keys(ptr);
+if(ids.length===1){if(p.m){var k=vb.w/svg.clientWidth;vb.x-=dx*k;vb.y-=dy*k;clampVB();setVB()}}
+else if(ids.length===2){var a=ptr[ids[0]],b=ptr[ids[1]];a.m=b.m=true;var d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch){var m=toSvg((a.x+b.x)/2,(a.y+b.y)/2);zoomAt(m.x,m.y,d/pinch)}pinch=d}});
+function endp(e){var p=ptr[e.pointerId];if(p&&!p.m&&Object.keys(ptr).length===1)tap(e);delete ptr[e.pointerId];pinch=0}
+svg.addEventListener("pointerup",endp);svg.addEventListener("pointercancel",function(e){delete ptr[e.pointerId];pinch=0});
+function nearest(x,y,max){var b=null,bd=max;Object.keys(N).forEach(function(id){var n=N[id];if(n.f!==fl)return;var c=X(n.p),d=Math.hypot(c[0]-x,c[1]-y);if(d<bd){bd=d;b=id}});return b}
+function tap(e){var p=toSvg(e.clientX,e.clientY),s=vb.w/BW,id=nearest(p.x,p.y,18*s);if(!id&&mode==="from")id=nearest(p.x,p.y,1e9);if(id)pickNode(id)}
+/* ===== STATE + DRAW ===== */
+var from="",to="",fl=1,mode="to",path=null,showNames=false,COL={atr:"#7c3aed",ent:"#475467",shop:"#0f9d58",food:"#e8590c",fun:"#0284c7",svc:"#0891b2",off:"#b45309"};
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+function draw(){svg.innerHTML="";if(fl>=4)el("polygon",{points:pts(PGPOLY),fill:"var(--panel)",stroke:"var(--grid)","stroke-width":3,"stroke-linejoin":"round"});var z=BW/vb.w,all=showNames||z>=1.6,fe=E.filter(function(e){return!e.v&&N[e.a].f===fl});
+fe.forEach(function(e){if(N[e.a].t==="atr"&&N[e.b].t==="atr")el("polyline",{points:pts(geo(e,true)),"class":"cor"})});
+fe.forEach(function(e){if(N[e.a].t==="atr"&&N[e.b].t==="atr")el("polyline",{points:pts(geo(e,true)),"class":"cor2"});else if(N[e.a].t==="ent")el("polyline",{points:pts(geo(e,true)),"class":"cor"});else el("polyline",{points:pts(geo(e,true)),"class":"spur"})});
+if(path)path.forEach(function(s){if(!s.e.v&&N[s.from].f===fl&&N[s.to].f===fl)el("polyline",{points:pts(geo(s.e,s.fwd)),"class":"ant"})});
+var tiles=[];
+Object.keys(N).forEach(function(id){var n=N[id];if(n.f!==fl)return;var c=X(n.p),g=el("g",{"class":"pin"}),big=n.t==="atr"||n.t==="ent",isTo=id===to,isFr=id===from;
+if(n.t==="atr")el("circle",{cx:c[0],cy:c[1],r:17,fill:"none",stroke:"#7c3aed","stroke-opacity":.35,"stroke-dasharray":"3 3"},g);
+el("circle",{cx:c[0],cy:c[1],r:big?11:(isTo||isFr?8:5.5),fill:isTo?"var(--route)":isFr?"#2563eb":COL[n.t],stroke:"var(--panel)","stroke-width":2},g);
+if(n.t==="atr")el("text",{x:c[0],y:c[1]},g).textContent="↕";
+if(id[0]==="N")el("text",{x:c[0],y:c[1]},g).textContent="E"+n.name.slice(9);
+if(isTo||isFr||id[0]==="N"||n.t==="atr"||all)tiles.push([id,c,isTo,isFr])});
+tiles.forEach(function(t){var n=N[t[0]];var w=n.name.length*4.2+10,c=t[1],g=el("g",{"class":"tile"});
+el("rect",{x:c[0]-w/2,y:c[1]-24,width:w,height:12,rx:6,stroke:t[2]?"var(--route)":t[3]?"#2563eb":COL[n.t],"stroke-width":t[2]||t[3]?2:1},g);
+el("text",{x:c[0],y:c[1]-18},g).textContent=n.name})}
+function pickNode(id){if(mode==="from"){from=id;setMode("to")}else to=id;sync()}
+function setMode(m){mode=m;document.getElementById("pick").className="b"+(m==="from"?" on":"");document.getElementById("pick").textContent=m==="from"?"Cancel picking":"Pick my spot on map";document.getElementById("hint").className="hint"+(m==="from"?" show":"")}
+function tabs(){var t=document.getElementById("tabs"),used={};if(path)path.forEach(function(s){used[N[s.from].f]=1;used[N[s.to].f]=1});t.innerHTML="";FL.forEach(function(n,i){if(i===0||i===4){var s=document.createElement("span");s.style.cssText="width:100%;font-size:12px;color:var(--muted)";s.textContent=i?"Paragon Plaza (offices, food court, shops)":"Main mall";t.appendChild(s)}var b=document.createElement("button");b.className="b"+(i===fl?" on":"");b.textContent=n+(used[i]?" •":"");b.onclick=function(){fl=i;tabs();draw();chips()};t.appendChild(b)})}
+function chips(){var q=document.getElementById("q").value.toLowerCase(),c=document.getElementById("chips");c.innerHTML="";var D=from?dists(from):null,wide=cat!=="all"||q.length>1;
+Object.keys(N).filter(function(id){var n=N[id];if(cat!=="all"&&n.t!==cat)return false;return(wide||n.f===fl)&&n.name.toLowerCase().indexOf(q)>=0}).sort(function(a,b){return D?(D[a]-D[b]):(N[a].name<N[b].name?-1:1)}).forEach(function(id){var n=N[id],b=document.createElement("button");b.className="chip"+(id===to?" on":"");b.innerHTML='<i style="background:'+COL[n.t]+'"></i>'+n.name+(wide||D?' <small style="color:var(--muted)">'+(wide?FL[n.f]:'')+(wide&&D?' · ':'')+(D&&D[id]<1e8?Math.round(D[id]/5)*5+' m':'')+'</small>':'');b.onclick=function(){pickNode(id)};c.appendChild(b)})}
+function opts(sel,val){sel.innerHTML='<option value="">Choose…</option>';[1,0,2,3,5,4,6,7,8,9].forEach(function(i){var g=document.createElement("optgroup");g.label=FLN[i];Object.keys(N).forEach(function(id){var n=N[id];if(n.f!==i)return;var o=document.createElement("option");o.value=id;o.textContent=n.name;g.appendChild(o)});sel.appendChild(g)});sel.value=val}
+function sync(){opts(document.getElementById("from"),from);opts(document.getElementById("to"),to);
+var sum=document.getElementById("sum"),ol=document.getElementById("steps");ol.innerHTML="";path=null;
+if(from&&to&&from!==to)path=solve(from,to);
+if(!path){sum.textContent=from&&to&&from===to?"You’re already there.":(from?"You’re near "+N[from].name+". Now choose where to go.":"Choose where you are and where you’re going.");tabs();draw();chips();return}
+var tot=0,st=[];path.forEach(function(s){tot+=s.e.len;var a=N[s.from],b=N[s.to],l=st[st.length-1];
+if(s.e.tag==="link"){st.push({v:2,to:b.name,f:b.f,f0:a.f,m:Math.round(s.e.len)})}else if(a.f!==b.f){var up=b.f>a.f?1:-1;if(l&&l.v&&l.up===up&&l.at===a.name){l.n++;l.f=b.f}else st.push({v:1,up:up,at:a.name,aid:s.from,n:1,f:b.f,f0:a.f,lift:s.e.tag==="lift"})}
+else{if(l&&!l.v&&l.to===b.name)return;st.push({v:0,m:Math.round(s.e.len),to:b.name,id:s.to,f:b.f})}});
+var LMK=[{2:"Nike",3:"the Hypermarket entrance",5:"Marks & Spencer",6:"H&M"},{1:"Forever 21",2:"Diesel",3:"Krispy Kreme",4:"Chili’s",5:"Croma",6:"H&M"},{1:"Forever 21",2:"Mothercare",3:"Starbucks",4:"PVR and Burger King",5:"Pizza Hut",6:"Wok Express"},{2:"Timezone Gaming",3:"Balaji",4:"the Food Court"}];
+function hint(id){var n=N[id];if(!n||n.t!=="atr")return"";var h=(LMK[n.f]||{})[+n.name.slice(7)];return h?" <small>(near "+h+")</small>":""}
+function badge(f){return'<span style="font-size:11px;padding:1px 7px;border-radius:6px;background:var(--bg);margin-right:6px">'+FL[f]+'</span>'}
+st.forEach(function(s){var li=document.createElement("li");li.style.cursor="pointer";var fo=s.v?s.f0:s.f;li.onclick=function(){fl=fo;tabs();draw();chips()};
+li.innerHTML=badge(fo)+(s.v===2?"Walk about "+Math.max(5,Math.round(s.m/5)*5)+" m outside along the boulevard to <b>"+s.to+"</b>":s.v?"Take the "+(s.lift?"lift":"escalator")+" "+(s.up>0?"up":"down")+" "+s.n+" floor"+(s.n>1?"s":"")+" at <b>"+s.at+"</b>"+hint(s.aid)+" <small>→ "+FLN[s.f]+"</small>":"Walk about "+Math.max(5,Math.round(s.m/5)*5)+" m to <b>"+s.to+"</b>"+hint(s.id));ol.appendChild(li)});
+var last=document.createElement("li");last.innerHTML="<b>Arrive at "+N[to].name+"</b> <small>("+FLN[N[to].f].toLowerCase()+")</small>";ol.appendChild(last);
+sum.innerHTML="<b>~"+Math.round(tot/5)*5+" m</b> · about "+Math.max(1,Math.round(tot/1.3/60))+" min"+(N[from].f!==N[to].f?" · changes floor":"")+" <small style='color:var(--muted)'>(rough estimate)</small>";
+fl=N[from].f;tabs();draw();chips()}
+document.getElementById("from").onchange=function(){from=this.value;sync()};
+document.getElementById("to").onchange=function(){to=this.value;sync()};
+document.getElementById("swap").onclick=function(){var t=from;from=to;to=t;sync()};
+document.getElementById("pick").onclick=function(){setMode(mode==="from"?"to":"from")};
+document.getElementById("q").oninput=chips;
+document.getElementById("names").onclick=function(){showNames=!showNames;this.className="b"+(showNames?" on":"");this.textContent=showNames?"Hide names":"Show all names";draw()};
+var cat="all";
+function dists(a){var D={},dn={},ids=Object.keys(N);ids.forEach(function(i){D[i]=1e9});D[a]=0;for(var k=0;k<ids.length;k++){var u=null;ids.forEach(function(i){if(!dn[i]&&(u===null||D[i]<D[u]))u=i});if(u===null||D[u]>=1e9)break;dn[u]=1;adj(u).forEach(function(n){var nd=D[u]+n[1].len;if(nd<D[n[0]])D[n[0]]=nd})}return D}
+function nearestOf(prefix){var sum=document.getElementById("sum");if(!from){sum.textContent="Set where you are first: use the “I’m at” list or “Pick my spot on map”.";return}var D=dists(from),best=null;Object.keys(N).forEach(function(id){if(id!==from&&N[id].name.indexOf(prefix)===0&&(best===null||D[id]<D[best]))best=id});if(best){to=best;sync()}}
+document.getElementById("nw").onclick=function(){nearestOf("Washrooms")};
+document.getElementById("na").onclick=function(){nearestOf("ATM")};
+var CATS=[["all","All"],["food","Food & cafés"],["shop","Shops"],["fun","Fun & cinema"],["svc","Washrooms, ATMs & lifts"],["off","Offices"]];
+function renderCats(){var c=document.getElementById("cats");c.innerHTML="";CATS.forEach(function(k){var b=document.createElement("button");b.className="b"+(cat===k[0]?" on":"");b.textContent=k[1];b.onclick=function(){cat=k[0];renderCats();chips()};c.appendChild(b)})}
+function byName(n){return Object.keys(N).filter(function(i){return N[i].name===n})[0]}
+renderCats();from=byName("Entrance 3");to=byName("Food Court");sync();
+</script>
+</body>
+</html>
